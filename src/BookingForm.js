@@ -1,24 +1,27 @@
 import { useState } from "react";
 //import ConfirmedBooking from "./ConfirmedBooking";
-import { useNavigate } from "react-router-dom";
+//import { useNavigate } from "react-router-dom";
 
-function BookingForm({ availableTimes, updateTimes }) {
+function BookingForm({ availableTimes, updateTimes, submitForm }) {
     const [date, setDate] = useState("");
     const [time, setTime] = useState("");
     const [guests, setGuests] = useState("");
     const [occasion, setOcassion] = useState("");
     //const [success, setSuccess] = useState("");
-    const navigate =useNavigate();
-
     const handleSubmit = (e) => {
+        const formData = {
+            date,
+            time,
+            guests,
+            occasion,
+        };
         e.preventDefault();
         //setSuccess("You have successfully reserved a table!! Enjoy your meal.");
         setDate("");
         setTime("");
         setGuests("");
         setOcassion("");
-        navigate("/bookingconfirmation", {state : {success:"You have successfully reserved a table!! Enjoy your meal."},});
-
+        submitForm(formData);
     };
 
     const handleDateChange = (e) => {

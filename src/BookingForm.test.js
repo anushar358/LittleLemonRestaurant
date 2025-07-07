@@ -3,42 +3,45 @@ import BookingForm from './BookingForm';
 import { InitializeTimes, updateTimes } from './Main';
 
 test("Tests if the static text is present",()=>{
-    render(<BookingForm availableTimes={["17:00", "18:00"]} updateTimes={() => {}}/>)
+    render(<BookingForm availableTimes={["17:00", "18:00"]} updateTimes={() => {}} submitForm={()=>{}}/>)
     const staticText = screen.getByLabelText("Choose Date");
     expect(staticText).toBeInTheDocument();
 })
 
-test("tests the function initialiseTimes",()=>{
-    render(<BookingForm availableTimes={["17:00", "18:00"]} updateTimes={() => {}}/>)
-    const times=screen.getByDisplayValue("[17:00,18:00,19:00,20:00,21:00]");
-    expect(times).toBeInTheDocument();
-})
 
+describe('InitializeTimes', () => {
+  it('should return times from fetchAPI using today\'s date', () => {
+    const mockTimes = ['17:00', '18:00', '19:00'];
 
-// Main.test.js
-describe('initializeTimes & updateTimes', () => {
-  test('returns correct list of available time slots', () => {
-    const expected = [
-      "17:00",
-      "18:00",
-      "19:00",
-      "20:00",
-      "21:00",
-      "22:00",
-    ];
-    expect(InitializeTimes()).toEqual(expected);
+    // Mock today's date string
+    const today = new Date().toISOString().split('T')[0];
+
+    // Mock global fetchAPI
+    window.fetchAPI = jest.fn().mockReturnValue(mockTimes);
+
+    const result = InitializeTimes();
+
+    expect(window.fetchAPI).toHaveBeenCalledWith(today);
+    expect(result).toEqual(mockTimes);
   });
 });
 
+describe('updateTimes', () => {
+  it('should return current state if action payload is missing', () => {
+    const initialState = ['18:00', '19:00'];
+    const result = updateTimes(initialState, {});
+    expect(result).toBe(initialState); // should return same reference
+  });
 
-// Main.test.js
-describe('updateTimes reducer', () => {
-  test('returns same time slots regardless of input', () => {
-    const currentState = InitializeTimes();
-    const action = { type: 'update', payload: '2023-10-20' };
+  it('should call fetchAPI with action.payload and return new times', () => {
+    const newDate = '2025-07-10';
+    const mockTimes = ['17:30', '20:00'];
+    window.fetchAPI = jest.fn().mockReturnValue(mockTimes);
 
-    const updatedState = updateTimes(currentState, action);
+    const result = updateTimes([], { payload: newDate });
 
-    expect(updatedState).toEqual(currentState);
+    expect(window.fetchAPI).toHaveBeenCalledWith(newDate);
+    expect(result).toEqual(mockTimes);
   });
 });
+
