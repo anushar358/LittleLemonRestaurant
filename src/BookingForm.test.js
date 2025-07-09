@@ -1,6 +1,7 @@
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import BookingForm from './BookingForm';
 import { InitializeTimes, updateTimes } from './Main';
+
 
 test("Tests if the static text is present",()=>{
     render(<BookingForm availableTimes={["17:00", "18:00"]} updateTimes={() => {}} submitForm={()=>{}}/>)
@@ -45,3 +46,33 @@ describe('updateTimes', () => {
   });
 });
 
+describe("Booking Form",()=>{
+test("disables make reservation button when all of the inputs are not entered",()=>{
+ const mockhandleSubmit=jest.fn();
+ render(<BookingForm onsubmit={mockhandleSubmit} />);
+
+ const nameInput =screen.getByLabelText(/Enter Name/);
+ fireEvent.change(nameInput,{target:{value:"1234"}});
+
+ const emailInput =screen.getByLabelText(/Enter Email/);
+ fireEvent.change(emailInput,{target:{value:"1234"}});
+
+ const dateInput =screen.getByLabelText(/Choose Date/);
+ fireEvent.change(dateInput,{target:{value:"1234"}});
+
+ const timeInput =screen.getByLabelText(/Choose Time/);
+ fireEvent.change(timeInput,{target:{value:"1234"}});
+
+ const guestInput =screen.getByLabelText(/Number of guests/);
+ fireEvent.change(guestInput,{target:{value:"0"}});
+
+ const ocassionInput =screen.getByLabelText(/Occasion/);
+ fireEvent.change(ocassionInput,{target:{value:"1234"}});
+
+ const Reservationbutton = screen.getByRole("button");
+ fireEvent.click(Reservationbutton);
+
+ expect(mockhandleSubmit).not.toHaveBeenCalled();
+ expect(Reservationbutton).toHaveAttribute("disabled");
+})
+})
